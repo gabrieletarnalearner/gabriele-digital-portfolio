@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title></title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <header class="container header">
+<h1 class="train-title moving-train" aria-label="Welcome to Gabriele’s Train of Thought!">
+  <span class="engine" aria-hidden="true">
+    <svg viewBox="0 0 160 80" class="engine-svg" role="img" aria-label="Train engine">
+      <rect x="50" y="30" width="80" height="30" rx="6" />
+      <rect x="105" y="12" width="25" height="25" rx="4" />
+      <rect x="62" y="14" width="8" height="14" rx="2" />
+      <polygon points="130,60 150,60 140,30" />
+      <circle cx="65" cy="68" r="8" />
+      <circle cx="95" cy="68" r="8" />
+      <circle cx="125" cy="68" r="8" />
+    </svg>
+    <span class="steam" aria-hidden="true"></span>
+  </span>
+
+  <span class="car">Welcome</span>
+  <span class="car">to</span>
+  <span class="car">Gabriele’s</span>
+  <span class="car">Train</span>
+  <span class="car">of</span>
+  <span class="car">Thought!</span>
+</h1>
+
+      <!-- Simple tabs -->
+      <nav class="tabs" role="tablist" aria-label="Primary">
+        <button
+          class="tab active"
+          role="tab"
+          aria-selected="true"
+          aria-controls="about"
+          id="tab-about"
+          data-target="about"
+        >
+          About
+        </button>
+        <button
+          class="tab"
+          role="tab"
+          aria-selected="false"
+          aria-controls="contents"
+          id="tab-contents"
+          data-target="contents"
+        >
+          Contents
+        </button>
+        <button
+          class="tab"
+          role="tab"
+          aria-selected="false"
+          aria-controls="learn"
+          id="tab-learn"
+          data-target="learn"
+        >
+          Learn with me
+        </button>
+        <button
+          class="tab"
+          role="tab"
+          aria-selected="false"
+          aria-controls="quotes"
+          id="tab-quotes"
+          data-target="quotes"
+        >
+          Quotes
+        </button>
+      </nav>
+    </header>
+
+    <main class="container">
+  <!-- About -->
+  <section id="about" class="panel active" role="tabpanel" aria-labelledby="tab-about">
+    <div class="card">
+      <h2>About me and what I do:</h2>
+      <p>
+        Hello! I am a Master's student of IT & Learning at <strong>University of Gothenburg</strong> in Sweden.
+      </p>
+        My goal here is to develop an understanding of effective digital tool use in modern day classrooms.
+      </p>
+In the future, I'm going to work alongside educators to enhance both learning and teaching experiences!  
+       <h2>About the site:</h2>
+      <p>
+        Feel free to explore! You can track my process, learn some keywords or find inspiring quotes!
+      </p>
+
+    </div>
+  </section>
+
+  <!-- Contents -->
+  <section id="contents" class="panel" role="tabpanel" aria-labelledby="tab-contents">
+    <div class="card">
+      <div class="panel-header">
+        <h2>Contents</h2>
+        <div class="controls">
+          <label class="control">
+            Search:
+            <input id="searchBox" class="input" type="search" placeholder="Title, text, tag, or date…" />
+          </label>
+          <label class="control">
+            Sort:
+            <select id="sortOrder">
+              <option value="desc" selected>Newest first</option>
+              <option value="asc">Oldest first</option>
+            </select>
+          </label>
+          <label class="control">
+            Filter year:
+            <select id="yearFilter">
+              <option value="all" selected>All</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <!-- Editor UI -->
+      <details class="editor" open>
+        <summary class="editor-summary">Add a timeline entry</summary>
+        <form id="editorForm" class="editor-form">
+          <div class="form-row">
+            <label>Date
+              <input id="dateInput" class="input" type="date" required />
+            </label>
+            <label>Title
+              <input id="titleInput" class="input" type="text" placeholder="Short title" required />
+            </label>
+          </div>
+          <label>Text
+            <textarea id="textInput" class="textarea" rows="3" placeholder="Description / notes…" required></textarea>
+          </label>
+          <label>Tags (comma-separated)
+            <input id="tagsInput" class="input" type="text" placeholder="e.g. milestone, design" />
+          </label>
+          <div class="form-actions">
+            <button class="btn" type="submit">Add entry</button>
+            <button class="btn-ghost" type="reset">Clear</button>
+            <span id="editorMsg" class="muted small" role="status" aria-live="polite"></span>
+          </div>
+        </form>
+      </details>
+
+      <!-- Timeline -->
+      <ol id="timeline" class="timeline" aria-live="polite"></ol>
+
+      <p class="muted small">
+        Tip: Search matches words in title/text/tags or a date like <code>2025-09-12</code>.
+      </p>
+    </div>
+  </section>
+
+  <!-- Learn with me (flashcards) -->
+  <section id="learn" class="panel" role="tabpanel" aria-labelledby="tab-learn">
+    <div class="card">
+      <div class="panel-header">
+        <h2>Learn with me</h2>
+        <div class="controls">
+          <button id="seed20Btn" class="btn">Add 20 blank cards</button>
+        </div>
+      </div>
+
+      <!-- Editor -->
+      <details class="editor">
+        <summary class="editor-summary">Add / edit a flashcard</summary>
+        <form id="cardForm" class="editor-form">
+          <div class="form-row">
+            <label>Keyword (front)
+              <input id="cardTerm" class="input" type="text" placeholder="e.g. Entropy" required />
+            </label>
+            <label>Meaning (back)
+              <input id="cardDef" class="input" type="text" placeholder="e.g. Measure of disorder" required />
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">Save card</button>
+            <button class="btn-ghost" type="reset">Clear</button>
+            <span id="cardMsg" class="muted small" role="status" aria-live="polite"></span>
+          </div>
+          <input type="hidden" id="cardId" />
+        </form>
+      </details>
+
+      <!-- Grid of cards -->
+   <script>
+  // flip the test card when clicked
+  document.currentScript.previousElementSibling
+    .addEventListener('click', e => e.target.closest('.card3d')?.classList.toggle('flipped'));
+</script>
+
+      <ul id="cardsGrid" class="cards-grid" aria-live="polite"></ul>
+
+      <p class="muted small">Tip: click a card to flip it. Use “⋯” to edit or delete.</p>
+    </div>
+  </section>
+
+  <!-- Quotes -->
+  <section id="quotes" class="panel" role="tabpanel" aria-labelledby="tab-quotes">
+    <div class="card">
+      <div class="panel-header">
+        <h2>Quotes</h2>
+      </div>
+
+      <!-- Editor -->
+      <details class="editor">
+        <summary class="editor-summary">Add a quote</summary>
+        <form id="quoteForm" class="editor-form">
+          <label>Quote
+            <textarea id="quoteText" class="textarea" rows="3" placeholder="Write your quotation…" required></textarea>
+          </label>
+          <div class="form-row">
+            <label>Author
+              <input id="quoteAuthor" class="input" type="text" placeholder="— Name" required />
+            </label>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">Add quote</button>
+            <button class="btn-ghost" type="reset">Clear</button>
+            <span id="quoteMsg" class="muted small" role="status" aria-live="polite"></span>
+          </div>
+          <input type="hidden" id="quoteId" />
+        </form>
+      </details>
+
+      <!-- List -->
+      <div id="quotesList" class="quotes-list" aria-live="polite"></div>
+    </div>
+  </section>
+
+    </main>
+
+    <footer class="container footer">
+      <p class="muted">
+        © <span id="yearNow"></span> — Built with plain HTML, CSS, and
+        JavaScript.
+      </p>
+    </footer>
+<script>
+  // Select the moving train element
+  const train = document.querySelector('.moving-train');
+
+  // Toggle paused class when the train is clicked
+  train.addEventListener('click', () => {
+    train.classList.toggle('paused');
+  });
+</script>
+    <script src="app.js"></script>
+  </body>
+</html>

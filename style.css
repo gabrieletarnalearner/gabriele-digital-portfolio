@@ -1,0 +1,327 @@
+:root{
+  --bg:#0f172a;
+  --surface:#111827;
+  --border:rgba(255,255,255,.1);
+  --text:#e5e7eb;
+  --muted:#f3b4f4;
+  --accent:#6366f1;
+  --accent-2:#22c55e;
+  --ring:rgba(99,102,241,.35);
+  --danger:#ef4444;
+}
+
+/* Base */
+*{box-sizing:border-box}
+html,body{height:100%}
+ body{
+  margin: 0;
+    font-family: "Georgia", "Times New Roman", Times, serif;
+  color:var(--text);
+background: #2A7B9B;
+background: linear-gradient(90deg, rgba(42, 123, 155, 1) 0%, rgba(87, 199, 133, 1) 50%, rgba(237, 221, 83, 1) 100%);
+}
+.container{max-width:980px;margin:0 auto;padding:1.25rem}
+.header{padding-top:1.25rem}
+h1{margin:.25rem 0 0;font-size:clamp(1.8rem,3vw,2.2rem)}
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:1.25rem;
+  box-shadow:0 10px 30px rgba(0,0,0,.35);
+  backdrop-filter:saturate(120%) blur(2px);
+}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+code{background:rgba(255,255,255,.06);padding:.1rem .35rem;border-radius:6px;border:1px solid var(--border)}
+
+/* Tabs */
+.tabs{
+  display:flex;
+  gap:.12rem;
+  margin-top:.8rem;
+  border-bottom:1px solid var(--border);
+  padding-bottom:.5rem;
+}
+.tab{
+  appearance:none;border:none;background:transparent;color:var(--text);
+  font-weight:600;padding:.5rem .8rem;border-radius:10px;cursor:pointer;
+  transition: background .2s ease, transform .05s ease;
+}
+.tab:hover{background:rgba(255,255,255,.06)}
+.tab:active{transform:translateY(1px)}
+.tab.active{background:rgba(99,102,241,.15);outline:2px solid var(--ring)}
+
+/* Panels: show only active */
+.panel{display:none;margin-top:1rem}
+.panel.active{display:block}
+
+/* Panel header / controls */
+.panel-header{
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:.75rem;margin-bottom:.5rem;
+}
+.controls{display:flex;gap:.75rem;align-items:center;flex-wrap:wrap}
+.control select,.control .input{
+  background:transparent;color:var(--text);border:1px solid var(--border);
+  border-radius:8px;padding:.35rem .5rem;min-width:12ch;
+}
+
+/* Inputs */
+.input,.textarea,select{
+  width:100%;background:rgba(255,255,255,.03);border:1px solid var(--border);
+  color:var(--text);border-radius:10px;padding:.55rem .7rem;outline:none;
+}
+.input:focus,.textarea:focus,select:focus{
+  box-shadow:0 0 0 4px rgba(99,102,241,.15);border-color:var(--ring);
+}
+.textarea{resize:vertical}
+
+/* Buttons */
+.btn{
+  appearance:none;border:none;background:var(--accent);color:#fff;
+  font-weight:700;padding:.6rem .9rem;border-radius:10px;cursor:pointer;
+  box-shadow:0 8px 18px rgba(99,102,241,.25);
+  transition:transform .05s ease, background .2s ease;
+}
+.btn:hover{background:#4f46e5}
+.btn:active{transform:translateY(1px)}
+.btn-ghost{
+  appearance:none;border:1px dashed var(--border);background:transparent;color:var(--text);
+  font-weight:600;padding:.6rem .9rem;border-radius:10px;cursor:pointer;
+}
+.btn-sm{
+  font-weight:700;font-size:.85rem;padding:.35rem .55rem;border-radius:8px;
+  border:1px solid var(--border);background:rgba(255,255,255,.06);color:var(--text);cursor:pointer;
+}
+.btn-sm:hover{background:rgba(255,255,255,.1)}
+.btn-danger{border-color:rgba(239,68,68,.35);background:rgba(239,68,68,.08);color:#fecaca}
+.btn-danger:hover{background:rgba(239,68,68,.15)}
+
+/* Editor summary/form */
+.editor{margin:.5rem 0 1rem}
+.editor-summary{cursor:pointer;list-style:none;padding:.3rem 0 .6rem;font-weight:700}
+.editor-form{display:grid;gap:.7rem}
+.form-row{display:grid;grid-template-columns:1fr;gap:.7rem}
+@media (min-width:720px){.form-row{grid-template-columns:1fr 2fr}}
+.form-actions{display:flex;align-items:center;gap:.6rem}
+
+/* Timeline */
+.timeline{list-style:none;padding:0;margin:1rem 0;border-left:2px solid rgba(255,255,255,.12)}
+.timeline li{position:relative;margin:0 0 1rem 1rem;padding-left:.75rem}
+.timeline li::before{
+  content:"";position:absolute;left:-1.1rem;top:.25rem;width:.65rem;height:.65rem;
+  border-radius:50%;background:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.2);
+}
+.entry{background:rgba(255,255,255,.03);border:1px solid var(--border);border-radius:12px;padding:.75rem .9rem}
+.entry-header{display:flex;align-items:center;justify-content:space-between;gap:.5rem}
+.entry-actions{display:flex;gap:.4rem;flex-wrap:wrap}
+.entry time{font-weight:700;font-size:.95rem}
+.entry h3{margin:.25rem 0 .35rem;font-size:1.05rem}
+.badge{display:inline-block;margin-left:.5rem;padding:.1rem .45rem;font-size:.75rem;border-radius:999px;border:1px solid var(--border);color:var(--muted)}
+
+/* Inline editor in entry */
+.inline-form{display:grid;gap:.5rem;margin-top:.5rem}
+.inline-row{display:grid;grid-template-columns:1fr 2fr;gap:.5rem}
+@media (max-width:640px){.inline-row{grid-template-columns:1fr}}
+.inline-actions{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+
+/* Footer */
+.footer{padding-bottom:2rem;text-align:center}
+
+/* Quotes */
+.quotes-list{display:grid;gap:1rem;margin-top:1rem}
+.quote-card{
+  border:1px solid var(--border);border-radius:14px;padding:1rem;
+  background:linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+}
+.quote-text{font-size:clamp(1.2rem,2.4vw,1.6rem);line-height:1.35;font-weight:500;letter-spacing:.2px}
+.quote-author{margin-top:.4rem;color:var(--muted);font-weight:600;font-size:.95rem}
+.quote-actions{margin-top:.5rem;display:flex;gap:.4rem}
+
+/* =========================
+   Flashcards (simple 2D flip)
+   ========================= */
+
+/* grid of cards */
+.cards-grid{
+  list-style:none;margin:1rem 0 0;padding:0;
+  display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+}
+
+/* card container */
+.card3d{ position:relative; height:140px; }
+.card3d-inner{ position:absolute; inset:0; }
+
+/* faces stacked; we fade between them */
+.face{
+  position:absolute; inset:0; padding:.8rem;
+  display:flex; flex-direction:column; justify-content:center; align-items:center;
+  text-align:center;
+  opacity:1; transition:opacity .25s ease;
+}
+.face.back{
+  background:rgba(255,255,255,.06);
+  opacity:0; pointer-events:none;
+}
+
+/* flipped state: show back, hide front */
+.card3d.flipped .face.front{ opacity:0; pointer-events:none; }
+.card3d.flipped .face.back{ opacity:1; pointer-events:auto; }
+
+/* card chrome */
+.card-title{font-weight:800}
+.card-sub{color:var(--muted);font-size:.9rem;margin-top:.35rem}
+.card-actions{position:absolute;top:.4rem;right:.4rem;display:flex;gap:.25rem}
+.icon-btn{
+  border:1px solid var(--border);background:rgba(255,255,255,.08);
+  border-radius:8px;padding:.2rem .4rem;cursor:pointer;font-size:.9rem;
+}
+.icon-btn:hover{background:rgba(255,255,255,.14)}
+.card-empty .card-title{color:var(--muted);font-weight:600}
+/* === Train title (interactive h1) === */
+.train-title{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:flex-end;
+  gap:.4rem;
+  margin:.25rem 0 0;
+  font-size:clamp(1.4rem, 2.8vw, 2.1rem);
+}
+.moving-train {
+  cursor: pointer;
+}
+/* Engine */
+.engine{
+  display:inline-flex;
+  align-items:flex-end;
+  position:relative;
+  padding-right:.3rem;
+  animation: chug 1.8s ease-in-out infinite;
+}
+.engine-svg{
+  width:80px; height:auto;
+  fill: #ffffff;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.35));
+}
+
+/* Steam puff */
+.engine .steam{
+  position:absolute;
+  left: 66px; top: -6px;  /* above chimney */
+  width: 10px; height: 10px;
+  background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.9), rgba(255,255,255,.0) 60%);
+  border-radius: 50%;
+  opacity: 0;
+  animation: puff 2.2s ease-in-out infinite;
+}
+
+/* Cars (each word looks like a wagon) */
+.car {
+  position: relative;
+  display: inline-block;
+  padding: .35rem .6rem .6rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: #fcb94d;
+;      /* solid white by default */
+  color: #0f172a;           /* dark text for contrast */
+  font-weight: 800;
+  letter-spacing: .2px;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,.25));
+  animation: chug 1.8s ease-in-out infinite;
+}
+
+/* Make each wagon a different color for fun */
+.car:nth-child(2n)  { background: #edf67d; color: #0f172a; } /* yellow-green */
+.car:nth-child(3n)  { background: #57c785; color: #0f172a; } /* green */
+.car:nth-child(4n)  { background: #2a7b9b; color: #ffffff; } /* teal-blue */
+
+
+/* little connector between cars */
+.car::before{
+  content:"";
+  position:absolute;
+  left:-.35rem; bottom:.9rem;
+  width:.5rem; height:.2rem;
+  background: rgba(255,255,255,.25);
+  border-radius:2px;
+}
+
+/* wheels for each wagon */
+.car::after{
+  content:"";
+  position:absolute;
+  left:.5rem; right:.5rem; bottom:-.3rem;
+  height:.80rem;
+  background:
+    radial-gradient(circle, rgba(255,255,255,.95) 35%, transparent 36%) left bottom / .55rem .55rem no-repeat,
+    radial-gradient(circle, rgba(255,255,255,.95) 35%, transparent 36%) right bottom / .55rem .55rem no-repeat;
+}
+
+/* Subtle bob to simulate motion */
+@keyframes chug{
+  0%,100%{ transform: translateY(0) }
+  50%{ transform: translateY(1.5px) }
+}
+
+/* Steam animation */
+@keyframes puff{
+  0%   { transform: translate(0,0) scale(0.6); opacity: 0; }
+  10%  { opacity: .9; }
+  60%  { transform: translate(12px, -22px) scale(1.2); opacity: .4; }
+  100% { transform: translate(22px, -40px) scale(1.6); opacity: 0; }
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce){
+  .engine, .car{ animation: none !important; }
+  .engine .steam{ display:none; }
+}
+
+/* Optional: on hover, pause the bobbing (feels nice) */
+.train-title:hover .engine,
+.train-title:hover .car{ animation-play-state: paused; }
+/* === Animated looping train === */
+
+/* make sure it has its own line and room to move */
+.moving-train {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: .4rem;
+  white-space: nowrap;
+  overflow: hidden;
+  animation: trainLoop 15s linear infinite;
+  position: relative;
+  will-change: transform;
+}
+
+/* car + engine reuse existing styles from previous version */
+.moving-train .engine,
+.moving-train .car {
+  animation: none; /* disable bobbing */
+}
+
+/* steam stays active */
+.moving-train .engine .steam {
+  animation: puff 3.2s ease-in-out infinite;
+}
+
+/* the looping motion */
+@keyframes trainLoop {
+  0%   { transform: translateX(110%); }
+  100% { transform: translateX(-110%); }
+}
+
+/* pause on hover */
+.moving-train:hover { animation-play-state: paused; }
+
+/* reduce motion friendly */
+@media (prefers-reduced-motion: reduce) {
+  .moving-train { animation: none; }
+}
+/* Pause animation when the 'paused' class is added */
+.moving-train.paused {
+  animation-play-state: paused !important;
+}
