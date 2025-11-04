@@ -72,16 +72,78 @@ async function loadDefaultsFromFiles() {
     renderCards?.();
   } catch {}
 }
-window.addEventListener("DOMContentLoaded", () => {
+window.addEventListener("DOMContentLoaded", async () => {
   document.getElementById("yearNow").textContent = new Date().getFullYear();
+
   const fromHash = location.hash?.replace("#", "");
   const saved = localStorage.getItem("lastTab") || "about";
   const initial = ["about", "contents", "learn", "quotes"].includes(fromHash) ? fromHash : saved;
   activate(initial);
+
+  // Load whatever is already in localStorage (timeline)
   initData();
-  buildYearOptions(timelineData);
-  renderTimeline();
-});
+
+  // Seed defaults from JSON files if the viewer has none yet
+async function loadDefaultsFromFiles() {
+  // Only load defaults if the viewer has no local data yet
+  const hasTimeline  = !!localStorage.getItem('timelineData_v2');
+  const hasQuotes    = !!localStorage.getItem('quotes_v1');
+  const hasFlash     = !!localStorage.getItem('flashcards_v1');
+
+  if (hasTimeline && hasQuotes && hasFlash) return;
+
+  const fetchJSON = async (path) => {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
+
+  const [tl, q, fc] = await Promise.all([
+    hasTimeline ? null : fetchJSON('timeline.json?v=1'),
+    hasQuotes   ? null : fetchJSON('quotes.json?v=1'),
+    hasFlash    ? null : fetchJSON('flashcards.json?v=1'),
+  ]);
+
+  // --- Write directly to localStorage first ---
+  let changed = false;
+
+  if (Array.isArray(tl)) {
+    const withIds = tl.map(i => i?.id ? i : ({ ...i, id: uid() }));
+    localStorage.setItem('timelineData_v2', JSON.stringify(withIds));
+    timelineData = withIds;
+    changed = true;
+  }
+
+  if (Array.isArray(q)) {
+    localStorage.setItem('quotes_v1', JSON.stringify(q));
+    changed = true;
+  }
+
+  if (Array.isArray(fc)) {
+    localStorage.setItem('flashcards_v1', JSON.stringify(fc));
+    changed = true;
+  }
+
+  // --- Now reload from storage and render so UI updates ---
+  if (changed) {
+    try {
+      // timeline already set above
+      buildYearOptions?.(timelineData);
+      renderTimeline?.();
+
+      // ensure these arrays are (re)loaded from storage:
+      loadQuotes?.();
+      renderQuotes?.();
+
+      loadFlashcards?.();
+      renderCards?.();
+    } catch {}
+  }
+}
 
 // ---------- Data + persistence ----------
 const STORAGE_KEY = "timelineData_v2"; // bump key due to new fields
@@ -592,3 +654,4 @@ if (quotesList){
   loadQuotes(); renderQuotes();
 
 })();
+
