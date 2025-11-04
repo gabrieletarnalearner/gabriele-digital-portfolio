@@ -2,6 +2,7 @@
 const ALL_TABS = ["about","contents","learn","quotes"];
 const tabs = document.querySelectorAll(".tab");
 const panels = document.querySelectorAll(".panel");
+
 function activate(targetId) {
   tabs.forEach(t => {
     const active = t.dataset.target === targetId;
@@ -14,139 +15,12 @@ function activate(targetId) {
     history.replaceState(null, "", "#" + targetId);
   }
 }
+
 tabs.forEach(btn => btn.addEventListener("click", () => activate(btn.dataset.target)));
-async function loadDefaultsFromFiles() {
-  // Only load defaults if the viewer has no local data yet
-  const hasTimeline  = !!localStorage.getItem('timelineData_v2');
-  const hasQuotes    = !!localStorage.getItem('quotes_v1');
-  const hasFlash     = !!localStorage.getItem('flashcards_v1');
 
-  if (hasTimeline && hasQuotes && hasFlash) return;
-
-  // Small helper
-  const fetchJSON = async (path) => {
-    try {
-      const res = await fetch(path);
-      if (!res.ok) return null;
-      return await res.json();
-    } catch {
-      return null;
-    }
-  };
-
-  // Fetch files (with cache-busting query just in case)
-  const [tl, q, fc] = await Promise.all([
-    hasTimeline ? null : fetchJSON('timeline.json?v=1'),
-    hasQuotes   ? null : fetchJSON('quotes.json?v=1'),
-    hasFlash    ? null : fetchJSON('flashcards.json?v=1'),
-  ]);
-
-  // Seed timeline
-  if (tl && Array.isArray(tl)) {
-    // ensure each item has an id
-    timelineData = tl.map(i => i?.id ? i : ({ ...i, id: uid() }));
-    saveData?.();
-  }
-
-  // Seed quotes (if your code defines `quotes`, `saveQuotes`, `renderQuotes`)
-  if (q && Array.isArray(q)) {
-    if (typeof quotes !== 'undefined') {
-      quotes = q;
-      saveQuotes?.();
-    }
-  }
-
-  // Seed flashcards (if your code defines `flashcards`, `saveFlashcards`, `renderCards`)
-  if (fc && Array.isArray(fc)) {
-    if (typeof flashcards !== 'undefined') {
-      flashcards = fc;
-      saveFlashcards?.();
-    }
-  }
-
-  // Re-render UI after seeding
-  try {
-    buildYearOptions?.(timelineData);
-    renderTimeline?.();
-    renderQuotes?.();
-    renderCards?.();
-  } catch {}
-}
-window.addEventListener("DOMContentLoaded", async () => {
-  document.getElementById("yearNow").textContent = new Date().getFullYear();
-
-  const fromHash = location.hash?.replace("#", "");
-  const saved = localStorage.getItem("lastTab") || "about";
-  const initial = ["about", "contents", "learn", "quotes"].includes(fromHash) ? fromHash : saved;
-  activate(initial);
-
-  // Load whatever is already in localStorage (timeline)
-  initData();
-
-  // Seed defaults from JSON files if the viewer has none yet
-async function loadDefaultsFromFiles() {
-  // Only load defaults if the viewer has no local data yet
-  const hasTimeline  = !!localStorage.getItem('timelineData_v2');
-  const hasQuotes    = !!localStorage.getItem('quotes_v1');
-  const hasFlash     = !!localStorage.getItem('flashcards_v1');
-
-  if (hasTimeline && hasQuotes && hasFlash) return;
-
-  const fetchJSON = async (path) => {
-    try {
-      const res = await fetch(path);
-      if (!res.ok) return null;
-      return await res.json();
-    } catch {
-      return null;
-    }
-  };
-
-  const [tl, q, fc] = await Promise.all([
-    hasTimeline ? null : fetchJSON('timeline.json?v=1'),
-    hasQuotes   ? null : fetchJSON('quotes.json?v=1'),
-    hasFlash    ? null : fetchJSON('flashcards.json?v=1'),
-  ]);
-
-  // --- Write directly to localStorage first ---
-  let changed = false;
-
-  if (Array.isArray(tl)) {
-    const withIds = tl.map(i => i?.id ? i : ({ ...i, id: uid() }));
-    localStorage.setItem('timelineData_v2', JSON.stringify(withIds));
-    timelineData = withIds;
-    changed = true;
-  }
-
-  if (Array.isArray(q)) {
-    localStorage.setItem('quotes_v1', JSON.stringify(q));
-    changed = true;
-  }
-
-  if (Array.isArray(fc)) {
-    localStorage.setItem('flashcards_v1', JSON.stringify(fc));
-    changed = true;
-  }
-
-  // --- Now reload from storage and render so UI updates ---
-  if (changed) {
-    try {
-      // timeline already set above
-      buildYearOptions?.(timelineData);
-      renderTimeline?.();
-
-      // ensure these arrays are (re)loaded from storage:
-      loadQuotes?.();
-      renderQuotes?.();
-
-      loadFlashcards?.();
-      renderCards?.();
-    } catch {}
-  }
-}
 
 // ---------- Data + persistence ----------
-const STORAGE_KEY = "timelineData_v2"; // bump key due to new fields
+const STORAGE_KEY = "timelineData_v2";
 let timelineData = [];
 
 function initData() {
@@ -163,31 +37,34 @@ function initData() {
     ];
     saveData();
   } else {
-    // Ensure pre-existing items get an id
     timelineData = timelineData.map(i => i.id ? i : ({ ...i, id: uid() }));
     saveData();
   }
 }
+
 function saveData() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(timelineData));
 }
+
 function uid() {
   return "id_" + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
 }
 
+
 // ---------- DOM refs ----------
-const timelineEl = document.getElementById("timeline");
-const sortOrderEl = document.getElementById("sortOrder");
+const timelineEl   = document.getElementById("timeline");
+const sortOrderEl  = document.getElementById("sortOrder");
 const yearFilterEl = document.getElementById("yearFilter");
-const searchBoxEl = document.getElementById("searchBox");
+const searchBoxEl  = document.getElementById("searchBox");
 
 // Editor refs
 const editorForm = document.getElementById("editorForm");
-const dateInput = document.getElementById("dateInput");
+const dateInput  = document.getElementById("dateInput");
 const titleInput = document.getElementById("titleInput");
-const textInput = document.getElementById("textInput");
-const tagsInput = document.getElementById("tagsInput");
-const editorMsg = document.getElementById("editorMsg");
+const textInput  = document.getElementById("textInput");
+const tagsInput  = document.getElementById("tagsInput");
+const editorMsg  = document.getElementById("editorMsg");
+
 
 // ---------- Helpers ----------
 function buildYearOptions(items) {
@@ -195,12 +72,15 @@ function buildYearOptions(items) {
   yearFilterEl.innerHTML = '<option value="all" selected>All</option>' +
     years.map(y => `<option value="${y}">${y}</option>`).join("");
 }
+
 function parseISO(d){ const [y,m,da] = d.split("-").map(Number); return new Date(y, m-1, da); }
+
 function isValidISODate(d){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(d)) return false;
   const dt = parseISO(d);
   return dt instanceof Date && !isNaN(dt.getTime());
 }
+
 function escapeHTML(str){
   return String(str)
     .replaceAll("&","&amp;")
@@ -210,40 +90,42 @@ function escapeHTML(str){
     .replaceAll("'","&#39;");
 }
 
-// ---------- Render ----------
+function escapeAttr(str){
+  return String(str)
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;");
+}
+
+
+// ---------- Render timeline ----------
 function renderTimeline() {
+  if (!timelineEl) return;
+
   let items = [...timelineData];
 
-  // year filter
-  const yf = yearFilterEl.value || "all";
+  const yf = yearFilterEl?.value || "all";
   if (yf !== "all") items = items.filter(i => i.date.startsWith(yf + "-"));
 
-  // search filter
-  const q = (searchBoxEl.value || "").trim().toLowerCase();
+  const q = (searchBoxEl?.value || "").trim().toLowerCase();
   if (q) {
     items = items.filter(i => {
-      const hay = [
-        i.title, i.text,
-        (i.tags||[]).join(" "),
-        i.date
-      ].join(" ").toLowerCase();
+      const hay = [i.title, i.text, (i.tags||[]).join(" "), i.date].join(" ").toLowerCase();
       return hay.includes(q);
     });
   }
 
-  // sort
-  const order = sortOrderEl.value || "desc";
+  const order = sortOrderEl?.value || "desc";
   items.sort((a, b) => {
     const da = parseISO(a.date).getTime();
     const db = parseISO(b.date).getTime();
     return order === "asc" ? da - db : db - da;
   });
 
-  // render each item (with action buttons)
   timelineEl.innerHTML = items.map(i => renderItemHTML(i)).join("");
 }
 
-// Build HTML for a single item (view mode)
 function renderItemHTML(i){
   const tags = (i.tags || []).map(t => `<span class="badge">${escapeHTML(t)}</span>`).join("");
   return `
@@ -264,104 +146,105 @@ function renderItemHTML(i){
     </li>`;
 }
 
+
 // ---------- Events for filters/search ----------
-sortOrderEl.addEventListener("change", renderTimeline);
-yearFilterEl.addEventListener("change", renderTimeline);
-searchBoxEl.addEventListener("input", renderTimeline);
+if (sortOrderEl)  sortOrderEl.addEventListener("change", renderTimeline);
+if (yearFilterEl) yearFilterEl.addEventListener("change", renderTimeline);
+if (searchBoxEl)  searchBoxEl.addEventListener("input",  renderTimeline);
+
 
 // ---------- Add new item (top editor) ----------
-editorForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const date = (dateInput.value || "").trim();
-  const title = (titleInput.value || "").trim();
-  const text = (textInput.value || "").trim();
-  const tags = (tagsInput.value || "").split(",").map(t => t.trim()).filter(Boolean);
-
-  if (!isValidISODate(date)) {
-    editorMsg.textContent = "Please provide a valid date (YYYY-MM-DD).";
-    return;
-  }
-  if (!title || !text) {
-    editorMsg.textContent = "Title and text are required.";
-    return;
-  }
-
-  timelineData.push({ id: uid(), date, title, text, tags });
-  saveData();
-  buildYearOptions(timelineData);
-  renderTimeline();
-
-  editorForm.reset();
-  editorMsg.textContent = "Entry added.";
-  setTimeout(()=> editorMsg.textContent = "", 1500);
-});
-
-// ---------- Inline Edit/Delete via event delegation ----------
-timelineEl.addEventListener("click", (e) => {
-  const btn = e.target.closest("button");
-  if (!btn) return;
-
-  const li = e.target.closest("li[data-id]");
-  if (!li) return;
-  const id = li.getAttribute("data-id");
-  const itemIndex = timelineData.findIndex(x => x.id === id);
-  if (itemIndex === -1) return;
-
-  const action = btn.getAttribute("data-action");
-
-  if (action === "delete") {
-    const ok = confirm("Delete this entry?");
-    if (!ok) return;
-    timelineData.splice(itemIndex, 1);
-    saveData();
-    buildYearOptions(timelineData);
-    renderTimeline();
-    return;
-  }
-
-  if (action === "edit") {
-    // Replace the entry content with an inline form
-    const item = timelineData[itemIndex];
-    li.innerHTML = renderEditFormHTML(item);
-    return;
-  }
-
-  if (action === "cancel-edit") {
-    // Re-render original
-    const item = timelineData[itemIndex];
-    li.innerHTML = renderItemHTML(item);
-    return;
-  }
-
-  if (action === "save-edit") {
-    // Collect values from inline form
-    const date = li.querySelector('[name="date"]').value.trim();
-    const title = li.querySelector('[name="title"]').value.trim();
-    const text = li.querySelector('[name="text"]').value.trim();
-    const tagsRaw = li.querySelector('[name="tags"]').value.trim();
-    const tags = tagsRaw ? tagsRaw.split(",").map(s => s.trim()).filter(Boolean) : [];
-
-    const status = li.querySelector('.edit-status');
+if (editorForm) {
+  editorForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const date = (dateInput.value || "").trim();
+    const title = (titleInput.value || "").trim();
+    const text = (textInput.value || "").trim();
+    const tags = (tagsInput.value || "").split(",").map(t => t.trim()).filter(Boolean);
 
     if (!isValidISODate(date)) {
-      status.textContent = "Please use YYYY-MM-DD.";
+      editorMsg.textContent = "Please provide a valid date (YYYY-MM-DD).";
       return;
     }
     if (!title || !text) {
-      status.textContent = "Title and text are required.";
+      editorMsg.textContent = "Title and text are required.";
       return;
     }
 
-    // Update item (allow any date — past or future)
-    timelineData[itemIndex] = { ...timelineData[itemIndex], date, title, text, tags };
+    timelineData.push({ id: uid(), date, title, text, tags });
     saveData();
-    // Re-render whole list to reflect sort changes if date changed
+    buildYearOptions(timelineData);
     renderTimeline();
-    return;
-  }
-});
 
-// Build inline editor form HTML
+    editorForm.reset();
+    editorMsg.textContent = "Entry added.";
+    setTimeout(()=> editorMsg.textContent = "", 1500);
+  });
+}
+
+
+// ---------- Inline Edit/Delete via event delegation ----------
+if (timelineEl) {
+  timelineEl.addEventListener("click", (e) => {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+
+    const li = e.target.closest("li[data-id]");
+    if (!li) return;
+    const id = li.getAttribute("data-id");
+    const itemIndex = timelineData.findIndex(x => x.id === id);
+    if (itemIndex === -1) return;
+
+    const action = btn.getAttribute("data-action");
+
+    if (action === "delete") {
+      const ok = confirm("Delete this entry?");
+      if (!ok) return;
+      timelineData.splice(itemIndex, 1);
+      saveData();
+      buildYearOptions(timelineData);
+      renderTimeline();
+      return;
+    }
+
+    if (action === "edit") {
+      const item = timelineData[itemIndex];
+      li.innerHTML = renderEditFormHTML(item);
+      return;
+    }
+
+    if (action === "cancel-edit") {
+      const item = timelineData[itemIndex];
+      li.innerHTML = renderItemHTML(item);
+      return;
+    }
+
+    if (action === "save-edit") {
+      const date = li.querySelector('[name="date"]').value.trim();
+      const title = li.querySelector('[name="title"]').value.trim();
+      const text = li.querySelector('[name="text"]').value.trim();
+      const tagsRaw = li.querySelector('[name="tags"]').value.trim();
+      const tags = tagsRaw ? tagsRaw.split(",").map(s => s.trim()).filter(Boolean) : [];
+
+      const status = li.querySelector('.edit-status');
+
+      if (!isValidISODate(date)) {
+        status.textContent = "Please use YYYY-MM-DD.";
+        return;
+      }
+      if (!title || !text) {
+        status.textContent = "Title and text are required.";
+        return;
+      }
+
+      timelineData[itemIndex] = { ...timelineData[itemIndex], date, title, text, tags };
+      saveData();
+      renderTimeline();
+      return;
+    }
+  });
+}
+
 function renderEditFormHTML(item){
   const tagsStr = (item.tags || []).join(", ");
   return `
@@ -396,38 +279,22 @@ function renderEditFormHTML(item){
     </article>
   `;
 }
-function escapeAttr(str){
-  return String(str)
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;");
-}
 
-// Optional: expose helpers in console
-window.addTimelineItem = function({date, title, text, tags=[]}){
-  if (!isValidISODate(date)) throw new Error("Invalid date (YYYY-MM-DD).");
-  timelineData.push({ id: uid(), date, title, text, tags });
-  saveData();
-  buildYearOptions(timelineData);
-  renderTimeline();
-  return "Added timeline item.";
-};
-/* =========================
-   FLASHCARDS (Learn with me)
-   ========================= */
+
+// =========================
+// FLASHCARDS (Learn with me)
+// =========================
 const FLASH_KEY = "flashcards_v1";
 let flashcards = [];
 
-const cardsGrid = document.getElementById("cardsGrid");
-const cardForm = document.getElementById("cardForm");
-const cardTerm = document.getElementById("cardTerm");
-const cardDef  = document.getElementById("cardDef");
-const cardMsg  = document.getElementById("cardMsg");
-const cardId   = document.getElementById("cardId");
-const seed20Btn = document.getElementById("seed20Btn");
+const cardsGrid  = document.getElementById("cardsGrid");
+const cardForm   = document.getElementById("cardForm");
+const cardTerm   = document.getElementById("cardTerm");
+const cardDef    = document.getElementById("cardDef");
+const cardMsg    = document.getElementById("cardMsg");
+const cardId     = document.getElementById("cardId");
+const seed20Btn  = document.getElementById("seed20Btn");
 
-// Load / save
 function loadFlashcards(){
   try{ flashcards = JSON.parse(localStorage.getItem(FLASH_KEY) || "[]"); }
   catch{ flashcards = []; }
@@ -436,12 +303,12 @@ function saveFlashcards(){
   localStorage.setItem(FLASH_KEY, JSON.stringify(flashcards));
 }
 
-// Render grid
 function renderCards(){
   if(!cardsGrid) return;
   const html = flashcards.map(c => cardHTML(c)).join("") || emptyCardsHTML();
   cardsGrid.innerHTML = html;
 }
+
 function cardHTML(c){
   const empty = (!c.term && !c.def);
   return `
@@ -466,8 +333,8 @@ function cardHTML(c){
     </li>
   `;
 }
+
 function emptyCardsHTML(){
-  // show a few placeholder empties if no cards yet
   return Array.from({length:6}).map(()=>`
     <li class="card3d card-empty">
       <div class="card3d-inner">
@@ -485,7 +352,6 @@ function emptyCardsHTML(){
 
 function fcUid(){ return "fc_" + Date.now().toString(36) + Math.random().toString(36).slice(2,8); }
 
-// Flip / Edit / Delete (event delegation)
 if (cardsGrid){
   cardsGrid.addEventListener("click", (e) => {
     const li = e.target.closest("li.card3d");
@@ -498,7 +364,6 @@ if (cardsGrid){
       if (act === "edit"){
         const item = flashcards.find(x => x.id === cid);
         if (!item) return;
-        // Prefill form and jump to it
         cardId.value = item.id;
         cardTerm.value = item.term || "";
         cardDef.value  = item.def  || "";
@@ -513,26 +378,23 @@ if (cardsGrid){
       return;
     }
 
-    // no button → flip
     li.classList.toggle("flipped");
   });
 }
 
-// Seed 20 blank cards
 if (seed20Btn){
   seed20Btn.addEventListener("click", () => {
     if (!confirm("Add 20 blank cards?")) return;
     const blanks = Array.from({length:20}).map(()=>({ id: fcUid(), term:"", def:"" }));
-    flashcards = flashcards.concat(blanks).slice(0, 200); // soft cap
+    flashcards = flashcards.concat(blanks).slice(0, 200);
     saveFlashcards(); renderCards();
   });
 }
 
-// Add / Update via form
 if (cardForm){
   cardForm.addEventListener("submit", (e)=>{
     e.preventDefault();
-    const id = (cardId.value || "").trim();
+    const id   = (cardId.value || "").trim();
     const term = (cardTerm.value || "").trim();
     const def  = (cardDef.value  || "").trim();
     if (!term || !def){
@@ -553,18 +415,19 @@ if (cardForm){
   });
 }
 
-/* =================
-   QUOTES
-   ================= */
+
+// =================
+// QUOTES
+// =================
 const QUOTES_KEY = "quotes_v1";
 let quotes = [];
 
-const quotesList = document.getElementById("quotesList");
-const quoteForm  = document.getElementById("quoteForm");
-const quoteText  = document.getElementById("quoteText");
-const quoteAuthor= document.getElementById("quoteAuthor");
-const quoteMsg   = document.getElementById("quoteMsg");
-const quoteId    = document.getElementById("quoteId");
+const quotesList  = document.getElementById("quotesList");
+const quoteForm   = document.getElementById("quoteForm");
+const quoteText   = document.getElementById("quoteText");
+const quoteAuthor = document.getElementById("quoteAuthor");
+const quoteMsg    = document.getElementById("quoteMsg");
+const quoteId     = document.getElementById("quoteId");
 
 function loadQuotes(){
   try{ quotes = JSON.parse(localStorage.getItem(QUOTES_KEY) || "[]"); }
@@ -593,7 +456,6 @@ function renderQuotes(){
   `).join("");
 }
 
-// Add / Update
 if (quoteForm){
   quoteForm.addEventListener("submit", (e)=>{
     e.preventDefault();
@@ -618,7 +480,6 @@ if (quoteForm){
   });
 }
 
-// Edit / Delete via delegation
 if (quotesList){
   quotesList.addEventListener("click", (e)=>{
     const card = e.target.closest("[data-qid]");
@@ -648,10 +509,89 @@ if (quotesList){
   });
 }
 
-/* ======== Init when page loads ======== */
-(function initExtras(){
-  loadFlashcards(); renderCards();
-  loadQuotes(); renderQuotes();
 
-})();
+// ---------- Load defaults from JSON IF local is empty ----------
+async function loadDefaultsFromFiles() {
+  const hasTimeline  = !!localStorage.getItem('timelineData_v2');
+  const hasQuotes    = !!localStorage.getItem('quotes_v1');
+  const hasFlash     = !!localStorage.getItem('flashcards_v1');
 
+  if (hasTimeline && hasQuotes && hasFlash) return;
+
+  const fetchJSON = async (path) => {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
+
+  const [tl, q, fc] = await Promise.all([
+    hasTimeline ? null : fetchJSON('timeline.json?v=1'),
+    hasQuotes   ? null : fetchJSON('quotes.json?v=1'),
+    hasFlash    ? null : fetchJSON('flashcards.json?v=1'),
+  ]);
+
+  let changed = false;
+
+  if (Array.isArray(tl)) {
+    const withIds = tl.map(i => i?.id ? i : ({ ...i, id: uid() }));
+    localStorage.setItem('timelineData_v2', JSON.stringify(withIds));
+    timelineData = withIds;
+    changed = true;
+  }
+
+  if (Array.isArray(q)) {
+    localStorage.setItem('quotes_v1', JSON.stringify(q));
+    changed = true;
+  }
+
+  if (Array.isArray(fc)) {
+    localStorage.setItem('flashcards_v1', JSON.stringify(fc));
+    changed = true;
+  }
+
+  if (changed) {
+    // reload from storage & render
+    try {
+      buildYearOptions?.(timelineData);
+      renderTimeline?.();
+
+      loadQuotes?.();
+      renderQuotes?.();
+
+      loadFlashcards?.();
+      renderCards?.();
+    } catch {}
+  }
+}
+
+
+// ======== Init when page loads ========
+window.addEventListener("DOMContentLoaded", async () => {
+  const yearNowEl = document.getElementById("yearNow");
+  if (yearNowEl) yearNowEl.textContent = new Date().getFullYear();
+
+  const fromHash = location.hash?.replace("#", "");
+  const saved = localStorage.getItem("lastTab") || "about";
+  const initial = ["about", "contents", "learn", "quotes"].includes(fromHash) ? fromHash : saved;
+  activate(initial);
+
+  // 1) Load any local timeline
+  initData();
+
+  // 2) Seed defaults if needed (writes to localStorage)
+  await loadDefaultsFromFiles();
+
+  // 3) Load & render quotes/cards (covers both seeded + existing)
+  loadQuotes();
+  renderQuotes();
+  loadFlashcards();
+  renderCards();
+
+  // 4) Build filters and render timeline
+  buildYearOptions(timelineData);
+  renderTimeline();
+});
