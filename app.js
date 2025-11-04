@@ -15,7 +15,63 @@ function activate(targetId) {
   }
 }
 tabs.forEach(btn => btn.addEventListener("click", () => activate(btn.dataset.target)));
+async function loadDefaultsFromFiles() {
+  // Only load defaults if the viewer has no local data yet
+  const hasTimeline  = !!localStorage.getItem('timelineData_v2');
+  const hasQuotes    = !!localStorage.getItem('quotes_v1');
+  const hasFlash     = !!localStorage.getItem('flashcards_v1');
 
+  if (hasTimeline && hasQuotes && hasFlash) return;
+
+  // Small helper
+  const fetchJSON = async (path) => {
+    try {
+      const res = await fetch(path);
+      if (!res.ok) return null;
+      return await res.json();
+    } catch {
+      return null;
+    }
+  };
+
+  // Fetch files (with cache-busting query just in case)
+  const [tl, q, fc] = await Promise.all([
+    hasTimeline ? null : fetchJSON('timeline.json?v=1'),
+    hasQuotes   ? null : fetchJSON('quotes.json?v=1'),
+    hasFlash    ? null : fetchJSON('flashcards.json?v=1'),
+  ]);
+
+  // Seed timeline
+  if (tl && Array.isArray(tl)) {
+    // ensure each item has an id
+    timelineData = tl.map(i => i?.id ? i : ({ ...i, id: uid() }));
+    saveData?.();
+  }
+
+  // Seed quotes (if your code defines `quotes`, `saveQuotes`, `renderQuotes`)
+  if (q && Array.isArray(q)) {
+    if (typeof quotes !== 'undefined') {
+      quotes = q;
+      saveQuotes?.();
+    }
+  }
+
+  // Seed flashcards (if your code defines `flashcards`, `saveFlashcards`, `renderCards`)
+  if (fc && Array.isArray(fc)) {
+    if (typeof flashcards !== 'undefined') {
+      flashcards = fc;
+      saveFlashcards?.();
+    }
+  }
+
+  // Re-render UI after seeding
+  try {
+    buildYearOptions?.(timelineData);
+    renderTimeline?.();
+    renderQuotes?.();
+    renderCards?.();
+  } catch {}
+}
 window.addEventListener("DOMContentLoaded", () => {
   document.getElementById("yearNow").textContent = new Date().getFullYear();
   const fromHash = location.hash?.replace("#", "");
@@ -534,4 +590,5 @@ if (quotesList){
 (function initExtras(){
   loadFlashcards(); renderCards();
   loadQuotes(); renderQuotes();
+
 })();
